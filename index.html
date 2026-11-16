@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d1b">
+<title>IT CORE SYSTEM — Skill Tree RPG</title>
+<style>
+:root{--bg:#080d1b;--panel:#101a2d;--panel2:#0d1526;--line:#203554;--blue:#42c8ff;--cyan:#8cecff;--text:#eaf5ff;--muted:#91a8c4;--gold:#f5c96a;--green:#6ce0ad;--red:#ff7887;--purple:#b388ff;--shadow:0 16px 50px #0006}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#16355b 0,transparent 45%),var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid #315477;background:#142943;color:var(--text);border-radius:10px;padding:9px 14px;transition:.2s}button:hover{border-color:var(--blue);background:#1a3858}button.primary{background:linear-gradient(110deg,#087db8,#1552a2);border-color:#46caff;color:white}button.ghost{background:transparent}button.danger{border-color:#783d50;color:#ff9eaa}.hidden{display:none!important}
+.shell{max-width:1420px;margin:auto;padding:22px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.sigil{width:44px;height:44px;border:1px solid var(--blue);display:grid;place-items:center;color:var(--cyan);font-weight:900;transform:rotate(45deg);box-shadow:0 0 25px #26baff33}.sigil span{transform:rotate(-45deg)}.brand h1{font-size:18px;letter-spacing:.18em;margin:0}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.22em}.top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sync{font-size:12px;color:var(--green);display:flex;align-items:center;gap:7px}.dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 10px currentColor}
+.layout{display:grid;grid-template-columns:245px 1fr;gap:20px}.sidebar,.panel,.card{background:linear-gradient(145deg,#111e33ed,#0b1425ed);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}.sidebar{padding:16px;height:max-content;position:sticky;top:18px}.nav{display:grid;gap:7px}.nav button{text-align:left;background:transparent;border-color:transparent;color:var(--muted)}.nav button.active,.nav button:hover{background:#17304b;border-color:#2b6489;color:var(--cyan)}.nav-label{font-size:10px;letter-spacing:.2em;color:#607c9d;margin:17px 9px 7px}.side-foot{border-top:1px solid var(--line);margin-top:20px;padding-top:15px;color:var(--muted);font-size:12px}
+main{min-width:0}.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:4px 0 18px}.eyebrow{color:var(--blue);font-size:10px;letter-spacing:.22em;text-transform:uppercase}.page-head h2{font-size:26px;margin:3px 0 0}.muted{color:var(--muted)}.grid{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:15px}.card{padding:17px}.stat-label{color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase}.stat-value{font-size:26px;font-weight:750;margin:5px 0}.stat-sub{font-size:11px;color:var(--muted)}.bar{height:7px;background:#1c2d44;border-radius:99px;overflow:hidden;margin-top:9px}.bar span{display:block;height:100%;background:linear-gradient(90deg,#168ac8,#7ce8ff);border-radius:99px;transition:width .3s}.two{grid-template-columns:1.25fr .75fr}.section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}.section-title h3{margin:0;font-size:15px}.section-title small{color:var(--muted)}
+.rankbox{display:flex;align-items:center;gap:14px}.rank-emblem{width:68px;height:68px;border:1px solid var(--blue);background:#0c2940;display:grid;place-items:center;color:var(--cyan);font-size:24px;font-weight:900;clip-path:polygon(50% 0,90% 18%,90% 80%,50% 100%,10% 80%,10% 18%);filter:drop-shadow(0 0 12px #25caff55)}.rankbox h3{margin:0}.rankbox p{margin:2px 0;color:var(--muted);font-size:12px}.attribute{display:flex;align-items:center;gap:9px;margin:11px 0}.attribute b{width:38px;font-size:11px;color:var(--cyan)}.attribute .bar{flex:1;margin:0}.attribute em{font-style:normal;font-size:11px;color:var(--muted);width:32px;text-align:right}
+.tag{font-size:10px;color:var(--cyan);border:1px solid #245a78;border-radius:99px;padding:3px 8px;white-space:nowrap}
+.tag.gold{color:var(--gold);border-color:#7a6024;background:#261e0c}
+.tag.green{color:var(--green);border-color:#266b4e;background:#0e291e}
+.tag.purple{color:var(--purple);border-color:#51397a;background:#1c132b}
+
+/* Skill Tree Controls & Nodes */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.filter-bar input,.filter-bar select{background:#091426;border:1px solid #2b4563;border-radius:9px;color:var(--text);padding:9px 12px}
+.filter-bar input{flex:1;min-width:220px}
+.tier-block{margin-bottom:26px;border:1px solid #1e3552;border-radius:16px;background:#0b1322cc;padding:18px}
+.tier-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:1px solid #1d314c;padding-bottom:12px;margin-bottom:16px}
+.tier-header h3{margin:0;font-size:17px;color:var(--cyan);letter-spacing:.04em}
+.topic-card{border:1px solid #233c5c;background:#0e192b;border-radius:13px;padding:15px;margin-bottom:14px;transition:.2s}
+.topic-card.mastered{border-color:var(--gold);box-shadow:0 0 20px #f5c96a1a}
+.topic-top{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer}
+.topic-title{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.subtopics-grid{display:grid;gap:10px;margin-top:14px;padding-top:14px;border-top:1px dashed #223854}
+.subtopic{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#091220;border:1px solid #1c304a;border-radius:10px;padding:11px 13px;flex-wrap:wrap}
+.subtopic-info{flex:1;min-width:220px}
+.subtopic-name{font-weight:600;font-size:14px;color:var(--text)}
+.subtopic-desc{font-size:12px;color:var(--muted);margin-top:3px}
+.checkpoints{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.cp-btn{font-size:11px;padding:6px 10px;border-radius:8px;background:#101f33;border:1px solid #284466;color:var(--muted);display:flex;align-items:center;gap:5px}
+.cp-btn:hover{border-color:var(--blue);color:var(--text)}
+.cp-btn.active-t{background:#12334d;border-color:#42c8ff;color:#8cecff}
+.cp-btn.active-p{background:#12382b;border-color:#6ce0ad;color:#6ce0ad}
+.cp-btn.active-d{background:#2d2410;border-color:#f5c96a;color:#f5c96a}
+
+/* Visual Tree Map */
+.tree-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.map-col{background:#0b1322;border:1px solid #1e3552;border-radius:14px;padding:14px;position:relative}
+.map-col h4{margin:0 0 12px;font-size:13px;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #1c2f47;padding-bottom:8px}
+.map-node{background:#101d30;border:1px solid #264163;border-radius:10px;padding:10px;margin-bottom:10px;position:relative}
+.map-node.done{border-color:var(--green);background:#0d241f}
+.map-node.gold{border-color:var(--gold);background:#241e10}
+.map-node-title{font-size:12px;font-weight:650;margin-bottom:5px}
+.map-node .bar{height:5px;margin-top:5px}
+
+/* Boss Fight / Challenge Box */
+.boss-box{border:1px solid #355880;background:radial-gradient(circle at top right,#163459,#0c1626);border-radius:14px;padding:22px;text-align:center}
+.boss-box h3{margin:0 0 8px;color:var(--gold);font-size:20px}
+.boss-topic{font-size:17px;font-weight:700;color:var(--cyan);margin:12px 0}
+.boss-detail{color:var(--muted);font-size:13px;max-width:650px;margin:0 auto 18px}
+
+.authbox{max-width:420px;margin:8vh auto;padding:26px}.authbox input{width:100%;margin:7px 0;background:#091426;border:1px solid #2b4563;border-radius:9px;color:var(--text);padding:10px}.authbox button{width:100%;margin-top:9px}.notice{color:var(--muted);font-size:12px;margin-top:12px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#173c55;border:1px solid #3b9ac0;padding:11px 17px;border-radius:10px;z-index:20;box-shadow:var(--shadow)}
+footer{text-align:center;color:#5d7693;font-size:10px;letter-spacing:.12em;padding:25px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static}.nav{grid-template-columns:repeat(3,1fr)}.nav-label,.side-foot{display:none}.stats{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
+@media(max-width:560px){.shell{padding:12px}.nav{grid-template-columns:repeat(2,1fr)}.stats{gap:8px}.card{padding:13px}.page-head h2{font-size:21px}}
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="shell">
+  <div class="authbox panel">
+    <div class="brand"><div class="sigil"><span>IT</span></div><div><h1>IT CORE SYSTEM</h1><small>CS & ASIR SKILL TREE RPG</small></div></div>
+    <h2 style="margin-top:25px">Acceso al sistema</h2>
+    <p class="muted">Sincroniza tu árbol de habilidades informáticas con tu misma cuenta de Jona System.</p>
+    <input id="email" type="email" placeholder="Correo electrónico" autocomplete="email">
+    <input id="password" type="password" placeholder="Contraseña" autocomplete="current-password">
+    <button class="primary" id="loginBtn">Iniciar sesión</button>
+    <button id="registerBtn">Crear cuenta</button>
+    <p class="notice">Usa el mismo correo y contraseña que en Jona System para mantener tus datos en la nube.</p>
+    <p id="authError" class="notice" style="color:var(--red)"></p>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+<div class="shell">
+<header class="topbar">
+ <div class="brand"><div class="sigil"><span>IT</span></div><div><h1>IT CORE SYSTEM</h1><small>COMPUTER SCIENCE & SYSTEMS ARCHITECTURE · v1.0</small></div></div>
+ <div class="top-actions"><span class="sync"><i class="dot"></i><span id="syncText">Conectando…</span></span><button class="ghost" id="userBtn">Cuenta</button></div>
+</header>
+
+<div class="layout">
+<aside class="sidebar">
+ <div class="nav-label">NAVEGACIÓN</div>
+ <nav class="nav">
+  <button class="active" data-page="dashboard">◈ Resumen & Perfil</button>
+  <button data-page="tree">🌲 Árbol de Temario</button>
+  <button data-page="map">⬡ Mapa Visual</button>
+  <button data-page="boss">⚔️ Reto de Repaso</button>
+ </nav>
+ <div class="nav-label">CUENTA</div>
+ <nav class="nav"><button id="logoutBtn">↪ Cerrar sesión</button></nav>
+ <div class="side-foot">DE LA FÍSICA DEL SILICIO<br>A LA INTELIGENCIA ARTIFICIAL.</div>
+</aside>
+
+<main>
+<!-- DASHBOARD -->
+<section id="page-dashboard" class="page">
+ <div class="page-head"><div><div class="eyebrow">ARCHITECTURE MASTERY</div><h2>Panel de Ingeniería</h2></div><span class="tag">4 NIVELES · 17 TEMAS</span></div>
+ <div class="grid stats">
+  <div class="card"><div class="stat-label">Nivel Técnico</div><div class="stat-value" id="levelStat">1</div><div class="stat-sub" id="rankStat">Rango E · Script Kiddie</div></div>
+  <div class="card"><div class="stat-label">Experiencia Total</div><div class="stat-value" id="xpStat">0 XP</div><div class="bar"><span id="xpBar" style="width:0%"></span></div><div class="stat-sub" id="xpNext">0 / 100 XP para subir</div></div>
+  <div class="card"><div class="stat-label">Dominio Global</div><div class="stat-value" id="globalPct">0%</div><div class="bar"><span id="globalBar" style="width:0%"></span></div><div class="stat-sub" id="checkpointsCount">0 / 0 hitos completados</div></div>
+  <div class="card"><div class="stat-label">Temas Maestros (100%)</div><div class="stat-value" id="masteredTopics">0 / 17</div><div class="stat-sub">Nodos al máximo</div></div>
+ </div>
+
+ <div class="grid two">
+  <div class="card">
+   <div class="section-title"><h3>Progreso por Nivel del Curso</h3><button class="ghost" data-goto="tree">Ir al temario →</button></div>
+   <div id="tierSummary"></div>
+  </div>
+  <div class="card">
+   <div class="section-title"><h3>Atributos de Ingeniero</h3><small>6 Pilares Técnicos</small></div>
+   <div class="rankbox" style="margin-bottom:14px">
+    <div class="rank-emblem" id="rankEmblem">E</div>
+    <div><h3 id="playerRankTitle">Script Kiddie</h3><p id="playerRankSub">Rango E · Nivel 1</p></div>
+   </div>
+   <div id="attributesList"></div>
+  </div>
+ </div>
+</section>
+
+<!-- SKILL TREE LIST -->
+<section id="page-tree" class="page hidden">
+ <div class="page-head"><div><div class="eyebrow">SYLLABUS SKILL TREE</div><h2>Árbol de Contenidos</h2></div><span class="tag">TEORÍA +10 · PRÁCTICA +25 · OBSIDIAN +15</span></div>
+ <div class="filter-bar">
+  <input id="searchInput" type="text" placeholder="Buscar concepto (ej. VLSM, ACID, Docker, Von Neumann, BGP...)">
+  <select id="tierFilter">
+   <option value="ALL">Todos los Niveles (1–4)</option>
+   <option value="1">Nivel 1 · Físico y Bajo Nivel</option>
+   <option value="2">Nivel 2 · Control, Redes y Sec</option>
+   <option value="3">Nivel 3 · Software y Datos</option>
+   <option value="4">Nivel 4 · Servicios, Cloud e IA</option>
+  </select>
+  <select id="moduleFilter">
+   <option value="ALL">Todos los Módulos</option>
+   <option value="FH">FH (Hardware)</option>
+   <option value="ISO">ISO (Sistemas Op.)</option>
+   <option value="PAR">PAR (Redes)</option>
+   <option value="GBD">GBD / SGBD (Datos)</option>
+   <option value="LMSI">LMSI (Marcas)</option>
+   <option value="ASO">ASO (Sistemas Adv.)</option>
+   <option value="SRI">SRI (Servicios Red)</option>
+   <option value="IAW">IAW (Web / DevOps)</option>
+   <option value="CS">CS Core / IA</option>
+  </select>
+ </div>
+ <div id="treeContainer"></div>
+</section>
+
+<!-- VISUAL MAP -->
+<section id="page-map" class="page hidden">
+ <div class="page-head"><div><div class="eyebrow">ARCHITECTURE TOPOLOGY</div><h2>Mapa Visual de Habilidades</h2></div><span class="tag">VISTA PANORÁMICA</span></div>
+ <div class="tree-map" id="visualMap"></div>
+</section>
+
+<!-- BOSS FIGHT / SPACED REPETITION -->
+<section id="page-boss" class="page hidden">
+ <div class="page-head"><div><div class="eyebrow">ACTIVE RECALL PROTOCOL</div><h2>Reto de Repaso Aleatorio</h2></div><span class="tag">CONSOLIDACIÓN DE MEMORIA</span></div>
+ <div class="boss-box">
+  <div class="eyebrow">DESAFÍO DEL SISTEMA</div>
+  <h3>Simulación de Auditoría Técnica</h3>
+  <p class="muted">El sistema selecciona un nodo de tu temario (priorizando los ya estudiados) para que expliques el concepto en voz alta, hagas un esquema en Obsidian o ejecutes un comando real.</p>
+  <div class="boss-topic" id="bossTitle">Pulsa el botón para generar un desafío</div>
+  <div class="boss-detail" id="bossDesc">Pon a prueba tu retención sin mirar los apuntes.</div>
+  <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
+   <button class="primary" id="newBossBtn">🎲 Generar Desafío</button>
+   <button id="studiedBossBtn">🎯 Repasar solo temas iniciados</button>
+   <button class="ghost" id="completeBossBtn" style="border-color:var(--gold);color:var(--gold)">✓ Superado (+15 XP)</button>
+  </div>
+ </div>
+</section>
+</main>
+</div>
+<footer>IT CORE SYSTEM · SINCRONIZADO CON FIREBASE · CONSTRUYE TU MAESTRÍA TÉCNICA</footer>
+</div></div>
+<div id="toast" class="toast hidden"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDQkM2wpIF48HiXt0nvpN_rNFa07sJzNjE",
+  authDomain: "jona-system.firebaseapp.com",
+  projectId: "jona-system",
+  storageBucket: "jona-system.firebasestorage.app",
+  messagingSenderId: "74428487424",
+  appId: "1:74428487424:web:f04c01a59854e30dcc45e5",
+  measurementId: "G-FMQNE0405X"
+};
+
+const CURRICULUM = [
+  {
+    tier: 1,
+    title: "NIVEL 1: FÍSICO Y DE BAJO NIVEL",
+    subtitle: "Del bit y la electrónica digital hasta el ensamblaje de hardware",
+    topics: [
+      {
+        id: "t1_1", code: "1.1", title: "Fundamentos Teóricos y Representación de Datos", attr: "HWL", mod: "CS",
+        subs: [
+          { id: "s1_1_1", name: "Sistemas de Numeración y Conversión", desc: "Binario (Base 2), Hexadecimal (Base 16), aritmética binaria, signo-magnitud, C1 y C2." },
+          { id: "s1_1_2", name: "Representación de Datos y Codificación", desc: "ASCII, UTF-8, UTF-16, Unicode, Punto Flotante IEEE 754 (32/64 bits) y multimedia." },
+          { id: "s1_1_3", name: "Teoría de la Computación", desc: "Máquina de Turing, modelo de estados, Tesis de Church-Turing y Halting Problem." }
+        ]
+      },
+      {
+        id: "t1_2", code: "1.2", title: "Electrónica Digital y Lógica de Ordenadores", attr: "HWL", mod: "CS",
+        subs: [
+          { id: "s1_2_1", name: "Álgebra de Boole", desc: "Teoremas fundamentales, Leyes de De Morgan, tablas de verdad, Minterms/Maxterms y Karnaugh." },
+          { id: "s1_2_2", name: "Puertas Lógicas y Semiconductores", desc: "Transistores CMOS, puertas primarias (AND, OR, NOT) y universales (NAND, NOR, XOR, XNOR)." },
+          { id: "s1_2_3", name: "Circuitos Combinacionales", desc: "Codificadores, decodificadores, Multiplexores (MUX/DEMUX), Half Adder y Full Adder." },
+          { id: "s1_2_4", name: "Circuitos Secuenciales", desc: "Biestables Latches y Flip-Flops (SR, JK, D, T), señal de reloj (Clock), registros y contadores." }
+        ]
+      },
+      {
+        id: "t1_3", code: "1.3", title: "Arquitectura y Organización de Computadores", attr: "HWL", mod: "FH",
+        subs: [
+          { id: "s1_3_1", name: "Modelo de Arquitectura de Von Neumann", desc: "CPU, Memoria, Buses, E/S, cuello de botella y ciclo Fetch-Decode-Execute-Writeback." },
+          { id: "s1_3_2", name: "Estructura Interna de la CPU", desc: "ALU, Unidad de Control (PC, IR), registros, flags y jerarquía de caché L1, L2 y L3." },
+          { id: "s1_3_3", name: "Conjuntos de Instrucciones (ISA)", desc: "RISC vs CISC, arquitecturas x86-64, ARM y RISC-V, modos de direccionamiento y Assembly." },
+          { id: "s1_3_4", name: "Sistema de Buses", desc: "Bus de datos, direcciones y control; ancho de banda y frecuencia de reloj." }
+        ]
+      },
+      {
+        id: "t1_4", code: "1.4", title: "Componentes Hardware, Almacenamiento y Ensamblaje", attr: "HWL", mod: "FH",
+        subs: [
+          { id: "s1_4_1", name: "Componentes Físicos y Montaje", desc: "Motherboard (ATX/ITX, Socket, Chipset, PCIe), CPU, refrigeración, fuentes 80 Plus y RAM DDR4/DDR5." },
+          { id: "s1_4_2", name: "Sistemas de Almacenamiento y RAID", desc: "HDD magnético, SSD NAND (SLC/MLC/TLC/QLC), NVMe y niveles RAID 0, 1, 5, 6 y 10." },
+          { id: "s1_4_3", name: "Protección de Suministro Eléctrico", desc: "SAI/UPS (Off-line, In-line, On-line) y cálculo de potencia (VA/W) y autonomía." }
+        ]
+      }
+    ]
+  },
+  {
+    tier: 2,
+    title: "NIVEL 2: CONTROL, REDES Y CIBERSEGURIDAD",
+    subtitle: "Sistemas operativos, conmutación, enrutamiento y defensa de infraestructura",
+    topics: [
+      {
+        id: "t2_1", code: "2.1", title: "Arquitectura e Implantación de Sistemas Operativos", attr: "SYS", mod: "ISO",
+        subs: [
+          { id: "s2_1_1", name: "Núcleo (Kernel) y Virtualización", desc: "User vs Kernel mode, System Calls, Monolítico/Microkernel, Hipervisores Tipo 1/2 y redes VM." },
+          { id: "s2_1_2", name: "Gestión de Procesos y Concurrencia", desc: "PCB, estados, planificación (FIFO, Round Robin, SJF), Race Conditions, Mutex y Deadlock." },
+          { id: "s2_1_3", name: "Gestión de Memoria Principal y Virtual", desc: "Paginación, segmentación, MMU, TLB, memoria Swap, Page Faults y algoritmos FIFO/LRU." },
+          { id: "s2_1_4", name: "Almacenamiento, Sistemas de Archivos y LVM", desc: "MBR vs GPT, UEFI, inodes, ext4/NTFS/ZFS/Btrfs, volúmenes lógicos (PV/VG/LV) y /etc/fstab." },
+          { id: "s2_1_5", name: "Instalación y Automatización", desc: "Arranque en red PXE/TFTP, Unattended, Kickstart, Cloud-init y gestores APT/DNF/Chocolatey." }
+        ]
+      },
+      {
+        id: "t2_2", code: "2.2", title: "Redes y Comunicaciones de Datos", attr: "NET", mod: "PAR",
+        subs: [
+          { id: "s2_2_1", name: "Modelos OSI / TCP-IP y Capa Física", desc: "7 capas OSI, 4 TCP/IP, PDUs, encapsulamiento, cableado UTP/STP, fibra óptica y TIA/EIA-568." },
+          { id: "s2_2_2", name: "Capa de Enlace, Switching y VLANs", desc: "Tramas Ethernet, tabla CAM, VLANs 802.1Q (Access/Trunk), STP/RSTP y EtherChannel/LACP." },
+          { id: "s2_2_3", name: "Capa de Red, Subnetting y Routing", desc: "IPv4 CIDR/VLSM, IPv6 (SLAAC), enrutamiento estático, Inter-VLAN, OSPF/BGP, NAT/PAT e ICMP." },
+          { id: "s2_2_4", name: "Capa de Transporte y Sockets", desc: "TCP (3-Way Handshake, ventana deslizante), UDP, sockets IP:Puerto y rangos de puertos." }
+        ]
+      },
+      {
+        id: "t2_3", code: "2.3", title: "Administración Avanzada de Sistemas Operativos", attr: "SYS", mod: "ASO",
+        subs: [
+          { id: "s2_3_1", name: "Administración de Linux Avanzado", desc: "systemd, cron/timers, permisos POSIX, SUID/SGID/Sticky, ACLs, Bash scripting (grep/sed/awk) y CLI." },
+          { id: "s2_3_2", name: "Windows Server y Active Directory", desc: "Dominios, bosques, OUs, Controladores de Dominio, GPOs (LSDOU) y automatización PowerShell." }
+        ]
+      },
+      {
+        id: "t2_4", code: "2.4", title: "Ciberseguridad, Infraestructura y Alta Disponibilidad", attr: "SEC", mod: "ASO",
+        subs: [
+          { id: "s2_4_1", name: "Criptografía Aplicada y PKI", desc: "AES, RSA/ECC, SHA-256, firmas digitales, CA, certificados X.509, SSH y SSL/TLS." },
+          { id: "s2_4_2", name: "Seguridad Perimetral, Firewalls y VPNs", desc: "Firewalls Stateful/NGFW, iptables/nftables/ufw, IDS/IPS (Snort), IPsec, WireGuard y Proxies." },
+          { id: "s2_4_3", name: "Autenticación Centralizada y Auditoría", desc: "LDAP/LDAPS, Kerberos, RADIUS/TACACS+, MFA, RBAC, Syslog y SIEM." },
+          { id: "s2_4_4", name: "Alta Disponibilidad, Balanceo y Backups", desc: "Backups completos/diferenciales/incrementales, regla 3-2-1, RTO/RPO, HAProxy/Nginx y Keepalived." }
+        ]
+      }
+    ]
+  },
+  {
+    tier: 3,
+    title: "NIVEL 3: DESARROLLO DE SOFTWARE Y GESTIÓN DE DATOS",
+    subtitle: "Programación, algoritmos, bases de datos relacionales/NoSQL y lenguajes web",
+    topics: [
+      {
+        id: "t3_1", code: "3.1", title: "Programación, Paradigmas e Ingeniería del Software", attr: "DEV", mod: "CS",
+        subs: [
+          { id: "s3_1_1", name: "Fundamentos y Estructuras de Control", desc: "Tipos de datos, condicionales, bucles, funciones, paso por valor/referencia, scope y recursividad." },
+          { id: "s3_1_2", name: "Programación Orientada a Objetos (POO)", desc: "Encapsulamiento, abstracción, herencia, polimorfismo, clases, interfaces y try-catch." },
+          { id: "s3_1_3", name: "Programación Funcional y Multiparadigma", desc: "Inmutabilidad, funciones puras, Lambdas, Map/Filter/Reduce en Python y JavaScript." },
+          { id: "s3_1_4", name: "Ingeniería del Software y Git", desc: "SDLC, patrones (Singleton, Factory, Observer, MVC), Git/GitHub, Scrum/Kanban y Testing/TDD." }
+        ]
+      },
+      {
+        id: "t3_2", code: "3.2", title: "Estructuras de Datos, Algoritmos y Complejidad", attr: "DEV", mod: "CS",
+        subs: [
+          { id: "s3_2_1", name: "Estructuras de Datos Lineales y No Lineales", desc: "Arrays, listas enlazadas, Pilas (LIFO), Colas (FIFO), Árboles BST/AVL, Grafos y Tablas Hash." },
+          { id: "s3_2_2", name: "Algoritmos y Complejidad Big-O", desc: "Búsqueda binaria, Merge/Quick Sort, BFS/DFS, Dijkstra, notación Big-O y programación dinámica." }
+        ]
+      },
+      {
+        id: "t3_3", code: "3.3", title: "Diseño, Modelado y Lenguaje SQL", attr: "DEV", mod: "GBD",
+        subs: [
+          { id: "s3_3_1", name: "Diseño Conceptual y Lógico (E-R)", desc: "Entidades, relaciones, cardinalidad, modelo relacional, PK/FK y normalización (1FN, 2FN, 3FN, BCNF)." },
+          { id: "s3_3_2", name: "Lenguaje SQL (DDL, DML y TCL)", desc: "CREATE/ALTER, SELECT con JOINs, GROUP BY/HAVING, subconsultas, propiedades ACID y COMMIT/ROLLBACK." }
+        ]
+      },
+      {
+        id: "t3_4", code: "3.4", title: "Administración de SGBD y Bases de Datos NoSQL", attr: "DEV", mod: "GBD",
+        subs: [
+          { id: "s3_4_1", name: "Arquitectura y Optimización SGBD", desc: "MySQL/MariaDB, PostgreSQL, Oracle, vistas, triggers, procedimientos almacenados, índices y EXPLAIN." },
+          { id: "s3_4_2", name: "Seguridad, Backups y Replicación", desc: "Usuarios/roles (GRANT/REVOKE), copias lógicas/físicas, replicación Maestro-Esclavo y Sharding." },
+          { id: "s3_4_3", name: "Paradigma NoSQL", desc: "Teorema CAP, bases documentales (MongoDB/JSON), clave-valor (Redis), columnas y grafos (Neo4j)." }
+        ]
+      },
+      {
+        id: "t3_5", code: "3.5", title: "Lenguajes de Marcas y Gestión de Información", attr: "DEV", mod: "LMSI",
+        subs: [
+          { id: "s3_5_1", name: "XML, Validación y Transformación", desc: "Sintaxis XML, esquemas XSD/DTD, consultas XPath y transformaciones XSLT." },
+          { id: "s3_5_2", name: "JSON, YAML y Web Básica (HTML5/CSS3)", desc: "Intercambio ligero JSON/YAML, HTML5 semántico y diseño adaptativo con Flexbox y CSS Grid." },
+          { id: "s3_5_3", name: "Sistemas ERP y CRM", desc: "Implantación, módulos y migración de datos en plataformas como Odoo, SAP o Salesforce." }
+        ]
+      }
+    ]
+  },
+  {
+    tier: 4,
+    title: "NIVEL 4: SERVICIOS, DESPLIEGUE, CLOUD E IA",
+    subtitle: "Infraestructura de red aplicada, desarrollo full-stack, contenedores e inteligencia artificial",
+    topics: [
+      {
+        id: "t4_1", code: "4.1", title: "Servicios de Red e Infraestructura", attr: "NET", mod: "SRI",
+        subs: [
+          { id: "s4_1_1", name: "DHCP: Asignación Dinámica", desc: "Proceso DORA, rangos, concesiones, reservas por MAC y DHCP Relay." },
+          { id: "s4_1_2", name: "DNS: Resolución de Nombres", desc: "Jerarquía Raíz/TLD, servidores autoritativos/recursivos, registros A/AAAA/CNAME/MX/TXT/PTR y DNSSEC." },
+          { id: "s4_1_3", name: "NTP, Transferencia y Almacenamiento en Red", desc: "Sincronización NTP, FTP/SFTP/FTPS, compartición Linux con NFS y heterogénea con Samba (SMB)." },
+          { id: "s4_1_4", name: "Servicios de Correo Electrónico", desc: "SMTP, IMAP/POP3, arquitectura MTA (Postfix), MDA (Dovecot), MUA y seguridad SPF, DKIM y DMARC." }
+        ]
+      },
+      {
+        id: "t4_2", code: "4.2", title: "Servidores Web e Implantación de Aplicaciones", attr: "DEV", mod: "IAW",
+        subs: [
+          { id: "s4_2_1", name: "Administración de Apache y Nginx", desc: "Procesos vs eventos, Virtual Hosting, certificados SSL/TLS (Let's Encrypt) y reescritura de URLs." },
+          { id: "s4_2_2", name: "Pilas LAMP/LEMP y CMS", desc: "Despliegue Linux + Apache/Nginx + MySQL + PHP/Python/Node y gestión de CMS (WordPress/Drupal)." },
+          { id: "s4_2_3", name: "Desarrollo Web Full-Stack, APIs y Móvil", desc: "JS ES6+, React/Vue, APIs RESTful, JWT/OAuth2, WebSockets, Kotlin/Swift y Flutter." }
+        ]
+      },
+      {
+        id: "t4_3", code: "4.3", title: "Computación en la Nube, DevOps y Despliegue", attr: "CLD", mod: "IAW",
+        subs: [
+          { id: "s4_3_1", name: "Cloud Computing (AWS, Azure, GCP)", desc: "Modelos IaaS, PaaS y SaaS; despliegue en nube pública, privada, híbrida y multicloud." },
+          { id: "s4_3_2", name: "Contenedores, Docker, Kubernetes e IaC", desc: "Dockerfile, Docker Compose, clústeres Kubernetes (Pods, Services, Ingress) y Terraform/Ansible." },
+          { id: "s4_3_3", name: "CI/CD y Observabilidad", desc: "Pipelines en GitHub Actions/GitLab CI/Jenkins, Blue-Green/Canary, Prometheus, Grafana y pila ELK." }
+        ]
+      },
+      {
+        id: "t4_4", code: "4.4", title: "Inteligencia Artificial, Machine Learning y Big Data", attr: "CLD", mod: "CS",
+        subs: [
+          { id: "s4_4_1", name: "Ciencia de Datos y Big Data", desc: "Las 5 V del Big Data, pipelines ETL, Data Warehouses/Lakes y procesamiento con Hadoop y Spark." },
+          { id: "s4_4_2", name: "Aprendizaje Automático (Machine Learning)", desc: "Supervisado, No Supervisado (K-Means, PCA), Refuerzo, Feature Engineering y métricas F1/MSE." },
+          { id: "s4_4_3", name: "Deep Learning e IA Generativa", desc: "Redes neuronales ANN, CNN (visión), RNN/LSTM, Transformers, NLP y Grandes Modelos de Lenguaje (LLMs)." }
+        ]
+      }
+    ]
+  }
+];
+
+const ATTR_NAMES = {
+  HWL: "Hardware & Bajo Nivel",
+  SYS: "Sistemas Operativos",
+  NET: "Redes & Servicios",
+  SEC: "Ciberseguridad & HA",
+  DEV: "Software & Datos",
+  CLD: "Cloud, DevOps & IA"
+};
+
+const XP_VALUES = { t: 10, p: 25, d: 15 }; // Teoría, Práctica, Documentado en Obsidian
+const $ = id => document.getElementById(id);
+const defaultState = () => ({ progress: {}, updatedAt: Date.now() });
+let state = defaultState(), auth, db, user = null, unsubscribe = null, busy = false, currentBoss = null;
+
+function toast(msg) {
+  $('toast').textContent = msg;
+  $('toast').classList.remove('hidden');
+  setTimeout(() => $('toast').classList.add('hidden'), 2600);
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function getSubProgress(subId) {
+  return state.progress[subId] || { t: false, p: false, d: false };
+}
+
+function calculateStats() {
+  let totalXP = 0, totalCheckpoints = 0, completedCheckpoints = 0, masteredTopics = 0, totalTopics = 0;
+  const attrEarned = { HWL: 0, SYS: 0, NET: 0, SEC: 0, DEV: 0, CLD: 0 };
+  const attrMax = { HWL: 0, SYS: 0, NET: 0, SEC: 0, DEV: 0, CLD: 0 };
+  const tierStats = [];
+
+  CURRICULUM.forEach(tier => {
+    let tDone = 0, tTotal = 0;
+    tier.topics.forEach(topic => {
+      totalTopics++;
+      let topicDone = 0, topicTotal = topic.subs.length * 3;
+      topic.subs.forEach(sub => {
+        const prog = getSubProgress(sub.id);
+        totalCheckpoints += 3;
+        tTotal += 3;
+        attrMax[topic.attr] += 50;
+
+        if (prog.t) { totalXP += XP_VALUES.t; completedCheckpoints++; topicDone++; tDone++; attrEarned[topic.attr] += XP_VALUES.t; }
+        if (prog.p) { totalXP += XP_VALUES.p; completedCheckpoints++; topicDone++; tDone++; attrEarned[topic.attr] += XP_VALUES.p; }
+        if (prog.d) { totalXP += XP_VALUES.d; completedCheckpoints++; topicDone++; tDone++; attrEarned[topic.attr] += XP_VALUES.d; }
+      });
+      if (topicDone === topicTotal && topicTotal > 0) masteredTopics++;
+    });
+    tierStats.push({ tier: tier.tier, title: tier.title, done: tDone, total: tTotal, pct: Math.round((tDone / tTotal) * 100) });
+  });
+
+  // Bonus XP from boss challenges
+  totalXP += (state.bossXP || 0);
+
+  const level = Math.floor(totalXP / 100) + 1;
+  const within = totalXP % 100;
+  const ranks = [
+    ["E", "Script Kiddie"],
+    ["D", "Junior SysAdmin"],
+    ["C", "Systems Engineer"],
+    ["B", "Infrastructure Specialist"],
+    ["A", "Solutions Architect"],
+    ["S", "Principal Architect"]
+  ];
+  const rankIdx = Math.min(5, Math.floor((level - 1) / 5));
+
+  return {
+    totalXP, level, within,
+    rank: ranks[rankIdx][0],
+    rankTitle: ranks[rankIdx][1],
+    globalPct: Math.round((completedCheckpoints / totalCheckpoints) * 100),
+    completedCheckpoints, totalCheckpoints,
+    masteredTopics, totalTopics,
+    attrEarned, attrMax, tierStats
+  };
+}
+
+function renderAll() {
+  const st = calculateStats();
+  $('levelStat').textContent = st.level;
+  $('rankStat').textContent = `Rango ${st.rank} · ${st.rankTitle}`;
+  $('xpStat').textContent = `${st.totalXP} XP`;
+  $('xpBar').style.width = `${st.within}%`;
+  $('xpNext').textContent = `${st.within} / 100 XP para el nivel ${st.level + 1}`;
+  $('globalPct').textContent = `${st.globalPct}%`;
+  $('globalBar').style.width = `${st.globalPct}%`;
+  $('checkpointsCount').textContent = `${st.completedCheckpoints} / ${st.totalCheckpoints} hitos completados`;
+  $('masteredTopics').textContent = `${st.masteredTopics} / ${st.totalTopics}`;
+
+  $('rankEmblem').textContent = st.rank;
+  $('playerRankTitle').textContent = st.rankTitle;
+  $('playerRankSub').textContent = `Rango ${st.rank} · Nivel ${st.level}`;
+
+  // Tier summary
+  $('tierSummary').innerHTML = st.tierStats.map(t => `
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <strong style="color:var(--text)">${t.title}</strong>
+        <span style="color:var(--cyan)">${t.pct}% (${t.done}/${t.total})</span>
+      </div>
+      <div class="bar" style="margin-top:4px"><span style="width:${t.pct}%"></span></div>
+    </div>
+  `).join('');
+
+  // Attributes
+  $('attributesList').innerHTML = Object.entries(ATTR_NAMES).map(([code, name]) => {
+    const pct = st.attrMax[code] ? Math.round((st.attrEarned[code] / st.attrMax[code]) * 100) : 0;
+    return `
+      <div class="attribute">
+        <b>${code}</b>
+        <span class="muted" style="width:130px;font-size:11px">${name}</span>
+        <div class="bar"><span style="width:${pct}%"></span></div>
+        <em>${pct}%</em>
+      </div>
+    `;
+  }).join('');
+
+  renderTree();
+  renderVisualMap();
+}
+
+function renderTree() {
+  const query = $('searchInput').value.trim().toLowerCase();
+  const tierVal = $('tierFilter').value;
+  const modVal = $('moduleFilter').value;
+
+  const html = CURRICULUM.filter(t => tierVal === 'ALL' || String(t.tier) === tierVal).map(tier => {
+    const filteredTopics = tier.topics.filter(topic => {
+      if (modVal !== 'ALL' && topic.mod !== modVal) return false;
+      if (!query) return true;
+      const inTopic = topic.title.toLowerCase().includes(query);
+      const inSub = topic.subs.some(s => s.name.toLowerCase().includes(query) || s.desc.toLowerCase().includes(query));
+      return inTopic || inSub;
+    });
+
+    if (filteredTopics.length === 0) return '';
+
+    const topicsHTML = filteredTopics.map(topic => {
+      let doneCount = 0, totalCount = topic.subs.length * 3;
+      const subsHTML = topic.subs.filter(sub => {
+        if (!query) return true;
+        return topic.title.toLowerCase().includes(query) || sub.name.toLowerCase().includes(query) || sub.desc.toLowerCase().includes(query);
+      }).map(sub => {
+        const p = getSubProgress(sub.id);
+        if (p.t) doneCount++;
+        if (p.p) doneCount++;
+        if (p.d) doneCount++;
+        return `
+          <div class="subtopic">
+            <div class="subtopic-info">
+              <div class="subtopic-name">${escapeHTML(sub.name)}</div>
+              <div class="subtopic-desc">${escapeHTML(sub.desc)}</div>
+            </div>
+            <div class="checkpoints">
+              <button class="cp-btn ${p.t ? 'active-t' : ''}" data-sub="${sub.id}" data-type="t" title="+10 XP">${p.t ? '✓' : '○'} Teoría</button>
+              <button class="cp-btn ${p.p ? 'active-p' : ''}" data-sub="${sub.id}" data-type="p" title="+25 XP">${p.p ? '✓' : '○'} Práctica</button>
+              <button class="cp-btn ${p.d ? 'active-d' : ''}" data-sub="${sub.id}" data-type="d" title="+15 XP">${p.d ? '✓' : '○'} Obsidian</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Recalculate true topic completion even if search filtered subs
+      let trueDone = 0;
+      topic.subs.forEach(s => { const p = getSubProgress(s.id); if (p.t) trueDone++; if (p.p) trueDone++; if (p.d) trueDone++; });
+      const pct = Math.round((trueDone / totalCount) * 100);
+      const isMastered = pct === 100;
+
+      return `
+        <div class="topic-card ${isMastered ? 'mastered' : ''}">
+          <div class="topic-top">
+            <div class="topic-title">
+              <span class="tag ${isMastered ? 'gold' : ''}">${topic.code}</span>
+              <span>${escapeHTML(topic.title)}</span>
+              <span class="tag purple">${topic.attr}</span>
+              <span class="tag green">${topic.mod}</span>
+            </div>
+            <div style="text-align:right;min-width:90px">
+              <strong style="font-size:13px;color:${isMastered ? 'var(--gold)' : 'var(--cyan)'}">${pct}%</strong>
+              <div class="bar" style="margin-top:4px;height:5px"><span style="width:${pct}%;background:${isMastered ? 'var(--gold)' : ''}"></span></div>
+            </div>
+          </div>
+          <div class="subtopics-grid">${subsHTML}</div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="tier-block">
+        <div class="tier-header">
+          <div>
+            <h3>${escapeHTML(tier.title)}</h3>
+            <small class="muted">${escapeHTML(tier.subtitle)}</small>
+          </div>
+          <span class="tag">TIER ${tier.tier}</span>
+        </div>
+        ${topicsHTML}
+      </div>
+    `;
+  }).join('');
+
+  $('treeContainer').innerHTML = html || '<div class="card muted" style="text-align:center">No se encontraron temas con ese filtro.</div>';
+}
+
+function renderVisualMap() {
+  $('visualMap').innerHTML = CURRICULUM.map(tier => {
+    const nodes = tier.topics.map(topic => {
+      let done = 0, total = topic.subs.length * 3;
+      topic.subs.forEach(s => { const p = getSubProgress(s.id); if (p.t) done++; if (p.p) done++; if (p.d) done++; });
+      const pct = Math.round((done / total) * 100);
+      const cls = pct === 100 ? 'gold' : (pct > 0 ? 'done' : '');
+      return `
+        <div class="map-node ${cls}">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+            <span class="tag" style="font-size:9px">${topic.code} · ${topic.mod}</span>
+            <span style="font-size:11px;color:var(--cyan)">${pct}%</span>
+          </div>
+          <div class="map-node-title" style="margin-top:6px">${escapeHTML(topic.title)}</div>
+          <div class="bar"><span style="width:${pct}%;background:${pct === 100 ? 'var(--gold)' : ''}"></span></div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="map-col">
+        <h4>Nivel ${tier.tier}</h4>
+        ${nodes}
+      </div>
+    `;
+  }).join('');
+}
+
+async function mutate(fn) {
+  if (!user || busy) return;
+  busy = true;
+  $('syncText').textContent = 'Guardando…';
+  try {
+    const ref = doc(db, 'users', user.uid, 'tech_tree', 'state');
+    await runTransaction(db, async tx => {
+      const snap = await tx.get(ref);
+      let fresh = snap.exists() ? snap.data() : defaultState();
+      fresh.progress = fresh.progress || {};
+      fn(fresh);
+      fresh.updatedAt = Date.now();
+      tx.set(ref, { ...fresh, serverUpdatedAt: serverTimestamp() });
+    });
+    $('syncText').textContent = 'Sincronizado';
+  } catch (e) {
+    console.error(e);
+    $('syncText').textContent = 'Error de sync';
+    toast('Error al guardar en la nube.');
+  } finally {
+    busy = false;
+  }
+}
+
+$('treeContainer').addEventListener('click', async e => {
+  const btn = e.target.closest('.cp-btn');
+  if (!btn) return;
+  const subId = btn.dataset.sub;
+  const type = btn.dataset.type;
+  await mutate(s => {
+    s.progress[subId] = s.progress[subId] || { t: false, p: false, d: false };
+    s.progress[subId][type] = !s.progress[subId][type];
+    if (s.progress[subId][type]) {
+      toast(`+${XP_VALUES[type]} XP añadidos`);
+    }
+  });
+});
+
+// Filters
+$('searchInput').addEventListener('input', renderTree);
+$('tierFilter').addEventListener('change', renderTree);
+$('moduleFilter').addEventListener('change', renderTree);
+
+// Boss Fight / Spaced Repetition
+function pickBoss(onlyStarted = false) {
+  const pool = [];
+  CURRICULUM.forEach(tier => {
+    tier.topics.forEach(topic => {
+      topic.subs.forEach(sub => {
+        const p = getSubProgress(sub.id);
+        const started = p.t || p.p || p.d;
+        if (!onlyStarted || started) {
+          pool.push({ tier: tier.tier, topic: topic.title, mod: topic.mod, sub });
+        }
+      });
+    });
+  });
+  if (pool.length === 0) {
+    toast('Aún no has marcado ningún tema. Generando desafío general.');
+    return pickBoss(false);
+  }
+  currentBoss = pool[Math.floor(Math.random() * pool.length)];
+  $('bossTitle').textContent = `[Nivel ${currentBoss.tier} · ${currentBoss.mod}] ${currentBoss.sub.name}`;
+  $('bossDesc').textContent = `Tema: ${currentBoss.topic} — Conceptos clave a explicar o practicar: ${currentBoss.sub.desc}`;
+}
+
+$('newBossBtn').onclick = () => pickBoss(false);
+$('studiedBossBtn').onclick = () => pickBoss(true);
+$('completeBossBtn').onclick = async () => {
+  if (!currentBoss) { toast('Primero genera un desafío.'); return; }
+  await mutate(s => {
+    s.bossXP = (s.bossXP || 0) + 15;
+  });
+  toast('¡Desafío superado! +15 XP de consolidación');
+  pickBoss(false);
+};
+
+// Navigation
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.add('hidden'));
+  $('page-' + p).classList.remove('hidden');
+  document.querySelectorAll('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === p));
+}
+document.querySelectorAll('[data-page]').forEach(b => b.addEventListener('click', () => showPage(b.dataset.page)));
+document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showPage(b.dataset.goto)));
+
+// Auth
+$('userBtn').onclick = () => toast(user?.email || 'Cuenta activa');
+$('logoutBtn').onclick = () => signOut(auth);
+function showApp() { $('authScreen').classList.add('hidden'); $('app').classList.remove('hidden'); }
+function showAuth() { $('authScreen').classList.remove('hidden'); $('app').classList.add('hidden'); }
+
+const appFB = initializeApp(firebaseConfig);
+auth = getAuth(appFB);
+db = getFirestore(appFB);
+
+$('loginBtn').onclick = async () => {
+  try { $('authError').textContent = ''; await signInWithEmailAndPassword(auth, $('email').value.trim(), $('password').value); }
+  catch (e) { $('authError').textContent = 'Error de acceso: ' + e.code; }
+};
+$('registerBtn').onclick = async () => {
+  try { $('authError').textContent = ''; await createUserWithEmailAndPassword(auth, $('email').value.trim(), $('password').value); }
+  catch (e) { $('authError').textContent = 'Error al crear cuenta: ' + e.code; }
+};
+
+onAuthStateChanged(auth, u => {
+  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+  user = u;
+  if (!u) { showAuth(); return; }
+  showApp();
+  $('syncText').textContent = 'Conectando…';
+  const ref = doc(db, 'users', u.uid, 'tech_tree', 'state');
+  unsubscribe = onSnapshot(ref, snap => {
+    state = snap.exists() ? { ...defaultState(), ...snap.data() } : defaultState();
+    if (!snap.exists()) mutate(() => {});
+    renderAll();
+    $('syncText').textContent = 'Sincronizado';
+  }, err => {
+    $('syncText').textContent = 'Sin conexión';
+    console.error(err);
+  });
+});
+</script>
+</body>
+</html>
